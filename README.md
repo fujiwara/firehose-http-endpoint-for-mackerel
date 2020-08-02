@@ -24,11 +24,13 @@ $ GOARCH=amd64 GOOS=linux make
 $ ROLE_ARN=arn:aws:iam::123456789012:role/AWSLambdaBasicExecutionRole make deploy
 ```
 
-Create an Amazon API Gateway has HTTP integration with the Lambda function.
+Create an Amazon API Gateway which have a "HTTP integration" with that Lambda function.
+
+The IAM role for the lambda function requires only a policy equals to `arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecution`.
 
 ## Connect with Kinesis Data Firehose
 
-Setup a Kinesis Data Firehose which have a destination to HTTP endpoint with the API Gateway or your custom endpoint.
+Setup a Kinesis Data Firehose which have a destination to HTTP endpoint for the API Gateway or your custom endpoint.
 
 - HTTP endpoint URL: https://..../service
 - Access key: not required
