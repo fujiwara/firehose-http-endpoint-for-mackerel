@@ -1,0 +1,12 @@
+{
+  "Description": "A PoC of Firehose HTTP endpoint for Mackerel",
+  "FunctionName": "firehose-http-endpoint-for-mackerel",
+  "Handler": "firehose-http-endpoint-for-mackerel",
+  "MemorySize": 128,
+  "Role": "arn:aws:iam::314472643515:role/AWSLambdaBasicExecutionRole",
+  "Runtime": "go1.x",
+  "Timeout": 30,
+  "TracingConfig": {
+    "Mode": "PassThrough"
+  }
+}

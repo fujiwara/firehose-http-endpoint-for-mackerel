@@ -43,12 +43,13 @@ type Record struct {
 type ResponseBody struct {
 	RequestID    string `json:"requestId,omitempty"`
 	Timestamp    int64  `json:"timestamp,omitempty"`
-	ErrorMessage error  `json:"errorMessage,omitempty"`
+	ErrorMessage string  `json:"errorMessage,omitempty"`
 }
 
 func main() {
 	var mux = http.NewServeMux()
 	mux.HandleFunc("/service", handleServiceMetrics)
+	mux.HandleFunc("/", handleRoot)
 	ridge.Run(":8080", "/", mux)
 }
 
@@ -69,6 +70,11 @@ func parseRequest(r *http.Request) (string, string, *RequestBody, error) {
 	return apiKey, service, &body, nil
 }
 
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("content-type", "text/plain")
+	w.Write([]byte("OK\n"))
+}
+
 func handleServiceMetrics(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 	respBody := ResponseBody{
@@ -76,18 +82,26 @@ func handleServiceMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() {
 		respBody.Timestamp = time.Now().UnixNano() / int64(time.Millisecond)
+		if e := respBody.ErrorMessage; e != "" {
+			log.Printf("[error] error:%s", e)
+		}
 		json.NewEncoder(w).Encode(respBody)
 	}()
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		respBody.ErrorMessage = "POST method required"
+		return
+	}
 
 	apiKey, service, reqBody, err := parseRequest(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		respBody.ErrorMessage = err
+		respBody.ErrorMessage = err.Error()
 		return
 	}
 
 	if service == "" {
-		respBody.ErrorMessage = errors.New("[error] service not found in attributes")
+		respBody.ErrorMessage = errors.New("[error] service not found in attributes").Error()
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -100,7 +114,7 @@ func handleServiceMetrics(w http.ResponseWriter, r *http.Request) {
 
 	if err := postServiceMetrics(apiKey, service, reqBody.Records); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		respBody.ErrorMessage = err
+		respBody.ErrorMessage = err.Error()
 		return
 	}
 }
