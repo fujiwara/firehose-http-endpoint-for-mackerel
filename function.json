@@ -3,7 +3,7 @@
   "FunctionName": "firehose-http-endpoint-for-mackerel",
   "Handler": "firehose-http-endpoint-for-mackerel",
   "MemorySize": 128,
-  "Role": "arn:aws:iam::314472643515:role/AWSLambdaBasicExecutionRole",
+  "Role": "{{ must_env `ROLE_ARN` }}",
   "Runtime": "go1.x",
   "Timeout": 30,
   "TracingConfig": {
