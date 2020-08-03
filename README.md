@@ -1,6 +1,6 @@
 # firehose-http-endpoint-for-mackerel
 
-A PoC of Firehose HTTP Endpoint to post metrics to Mackerel.
+A PoC of Firehose HTTP Endpoint to post metrics to [Mackerel](https://mackerel.io/).
 
 ## Requirements
 
@@ -13,7 +13,7 @@ $ make
 $ ./firehose-http-endpoint-for-mackerel
 ```
 
-firehose-http-endpoint-for-mackerel runs on localhost:8080.
+firehose-http-endpoint-for-mackerel runs on 0.0.0.0:8080.
 
 ## How to run on Amazon API Gateway
 
@@ -21,7 +21,7 @@ firehose-http-endpoint-for-mackerel runs on localhost:8080.
 
 ```
 $ GOARCH=amd64 GOOS=linux make
-$ ROLE_ARN=arn:aws:iam::123456789012:role/AWSLambdaBasicExecutionRole make deploy
+$ ROLE_ARN=arn:aws:iam::123456789012:role/lambda make deploy
 ```
 
 Create an Amazon API Gateway which have a "HTTP integration" with that Lambda function.
@@ -33,15 +33,14 @@ The IAM role for the lambda function requires only a policy equals to `arn:aws:i
 Setup a Kinesis Data Firehose which have a destination to HTTP endpoint for the API Gateway or your custom endpoint.
 
 - HTTP endpoint URL: https://..../service
-- Access key: not required
+- Access key: Your Mackerel API Key
 - Content encoding: "Disabled"
 - Parameters
-  - apikey: Your Mackerel API Key
   - service: A Mackerel service name to post metrics
 
 ## How to post metrics to Firehose
 
-Post service metrics to the Firehose delivery stream. A Record format is allowed as below.
+Post service metrics to the Firehose delivery stream. Record formats are allowed as below.
 
 - JSON format `{"name":"metric.name","time":1596382129,"value":27759}`
 - Text format same as for Mackerel agent `metric.name\t27759\t1596382129`

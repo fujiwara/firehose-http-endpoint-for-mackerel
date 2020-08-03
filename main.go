@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
-	"strings"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/fujiwara/ridge"
 	"github.com/pkg/errors"
@@ -18,6 +18,7 @@ import (
 const (
 	commonAttrHeaderName = "X-Amz-Firehose-Common-Attributes"
 	requestIDHeaderName  = "X-Amz-Firehose-Request-Id"
+	accessKeyHeaderName  = "X-Amz-Firehose-Access-Key"
 )
 
 // FirehoseCommonAttributes represents common attributes (metadata).
@@ -43,7 +44,7 @@ type Record struct {
 type ResponseBody struct {
 	RequestID    string `json:"requestId,omitempty"`
 	Timestamp    int64  `json:"timestamp,omitempty"`
-	ErrorMessage string  `json:"errorMessage,omitempty"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
 func main() {
@@ -58,10 +59,13 @@ func parseRequest(r *http.Request) (string, string, *RequestBody, error) {
 	if err := json.Unmarshal([]byte(r.Header.Get(commonAttrHeaderName)), &attrs); err != nil {
 		return "", "", nil, fmt.Errorf("[error] failed to parse request header %s: %s", commonAttrHeaderName, err)
 	}
-	apiKey := attrs.CommonAttributes["apikey"]
-	service := attrs.CommonAttributes["service"]
+	apiKey := r.Header.Get(accessKeyHeaderName)
 	if apiKey == "" {
-		return "", "", nil, errors.New("[error] apikey not found in attributes")
+		return "", "", nil, errors.New("[error] apikey not found in access key")
+	}
+	service := attrs.CommonAttributes["service"]
+	if service == "" {
+		return "", "", nil, errors.New("[error] service not found in attributes")
 	}
 	var body RequestBody
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -97,12 +101,6 @@ func handleServiceMetrics(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		respBody.ErrorMessage = err.Error()
-		return
-	}
-
-	if service == "" {
-		respBody.ErrorMessage = errors.New("[error] service not found in attributes").Error()
-		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	log.Printf(
