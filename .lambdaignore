@@ -4,3 +4,4 @@ function.zip
 .git/*
 .terraform/*
 terraform.tfstate
+firehose-http-endpoint-for-mackerel
