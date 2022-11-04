@@ -1,4 +1,4 @@
-module github.com/mashiike/firehose-http-endpoint-for-mackerel
+module github.com/fujiwara/firehose-http-endpoint-for-mackerel
 
 go 1.19
 
