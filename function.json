@@ -4,7 +4,7 @@
   "Handler": "firehose-http-endpoint-for-mackerel",
   "MemorySize": 128,
   "Role": "{{ must_env `ROLE_ARN` }}",
-  "Runtime": "go1.x",
+  "Runtime": "provided.al2",
   "Timeout": 30,
   "TracingConfig": {
     "Mode": "PassThrough"

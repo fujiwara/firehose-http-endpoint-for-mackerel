@@ -15,3 +15,5 @@
 # vendor/
 
 .envrc
+bootstrap
+firehose-http-endpoint-for-mackerel
