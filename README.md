@@ -4,7 +4,7 @@ A PoC of Firehose HTTP Endpoint to post metrics to [Mackerel](https://mackerel.i
 
 ## Requirements
 
-Go 1.14
+Go 1.19
 
 ## How to run on local
 
